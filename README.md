@@ -1,0 +1,75 @@
+# MorrowindArmorFormula
+
+MorrowindArmorFormula is an SKSE plugin that replaces Skyrim's capped linear armor damage reduction with an effective-health style armor formula.
+
+```text
+physical damage multiplier = 1 / (1 + armorRating * percentHealthPerArmorPoint)
+```
+
+With the default `percentHealthPerArmorPoint = 0.01`:
+
+```text
+100 armor -> 50% physical damage
+300 armor -> 25% physical damage
+900 armor -> 10% physical damage
+```
+
+This bypasses Skyrim's vanilla 80% armor damage reduction cap because it adjusts final health damage after vanilla physical armor reduction has already been calculated.
+
+## Requirements
+
+- Skyrim Special Edition, Anniversary Edition, or VR
+- SKSE64 / SKSEVR matching the runtime
+- Address Library for SKSE Plugins, or VR Address Library for SKSEVR
+
+## Installation
+
+Install with a mod manager, or copy the package contents into the Skyrim Data folder:
+
+```text
+Data/SKSE/Plugins/MorrowindArmorFormula.dll
+Data/SKSE/Plugins/MorrowindArmorFormula.toml
+```
+
+## Configuration
+
+Edit:
+
+```text
+Data/SKSE/Plugins/MorrowindArmorFormula.toml
+```
+
+The main setting is:
+
+```toml
+percentHealthPerArmorPoint = 0.01
+```
+
+Set `minDamageMultiplier = 0.0` for no artificial cap. Set it to `0.20` to restore an 80% maximum reduction while keeping the new curve.
+
+## Build
+
+Install Visual Studio 2022 Build Tools and vcpkg, then run:
+
+```powershell
+.\scripts\build.ps1
+.\scripts\package.ps1
+```
+
+If `commonlibsse-ng` is installed in vcpkg but not discoverable, pass a prefix:
+
+```powershell
+.\scripts\build.ps1 -CMakePrefixPath "C:\path\to\vcpkg\packages\commonlibsse-ng_x64-windows;C:\path\to\vcpkg\packages\fmt_x64-windows;C:\path\to\vcpkg\packages\spdlog_x64-windows"
+```
+
+Some CommonLibSSE-NG installations also require adding the `rapidcsv_x64-windows` and `xbyak_x64-windows` package paths to the same prefix list.
+
+## Compatibility
+
+The plugin hooks `Actor::HandleHealthDamage` and uses `lastHitData` to adjust recent physical hits only. Magical damage, poison, scripts, traps, and other non-hit health damage are left alone by default.
+
+Other SKSE plugins that also replace `Actor::HandleHealthDamage` may conflict depending on load order and hook implementation.
+
+## License
+
+MIT
