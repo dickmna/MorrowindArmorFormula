@@ -80,37 +80,47 @@ namespace
         return total;
     }
 
+    [[nodiscard]] float FiniteOrZero(float value)
+    {
+        return std::isfinite(value) ? value : 0.0F;
+    }
+
     [[nodiscard]] float GetStoredActorValue(RE::Actor& target, RE::ActorValue actorValue)
     {
         const auto& runtimeData = target.GetActorRuntimeData();
 
-        auto result = 0.0F;
-        auto found = false;
+        auto baseValue = 0.0F;
+        auto storedModifierTotal = 0.0F;
+        auto foundBase = false;
+        auto foundModifiers = false;
 
         if (const auto* base = runtimeData.avStorage.baseValues[actorValue]) {
-            result += *base;
-            found = true;
+            baseValue = FiniteOrZero(*base);
+            foundBase = true;
         }
 
         if (const auto* modifiers = runtimeData.avStorage.modifiers[actorValue]) {
-            result += modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kPermanent];
-            result += modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kTemporary];
-            result += modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kDamage];
-            found = true;
+            storedModifierTotal += FiniteOrZero(modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kPermanent]);
+            storedModifierTotal += FiniteOrZero(modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kTemporary]);
+            storedModifierTotal += FiniteOrZero(modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kDamage]);
+            foundModifiers = true;
         }
 
-        if (!found && actorValue == RE::ActorValue::kDamageResist) {
-            result = runtimeData.armorRating;
+        auto result = foundBase || foundModifiers ? baseValue + storedModifierTotal : 0.0F;
+        if (actorValue != RE::ActorValue::kDamageResist) {
+            return result;
         }
 
-        if (actorValue == RE::ActorValue::kDamageResist) {
-            result = (std::max)(result, runtimeData.armorRating);
-
-            const auto modifierTotal = GetNonVirtualModifierTotal(target, actorValue);
-            if (std::isfinite(modifierTotal) && std::abs(modifierTotal) > std::abs(result)) {
-                result = modifierTotal;
-            }
+        const auto cachedArmor = FiniteOrZero(runtimeData.armorRating);
+        if (!foundBase && !foundModifiers) {
+            result = cachedArmor;
         }
+
+        const auto baseComponent = std::abs(baseValue) >= std::abs(cachedArmor) ? baseValue : cachedArmor;
+        const auto modifierTotal = GetNonVirtualModifierTotal(target, actorValue);
+        const auto selectedModifierTotal =
+            std::abs(modifierTotal) > 0.0001F || !foundModifiers ? modifierTotal : storedModifierTotal;
+        result = baseComponent + selectedModifierTotal;
 
         if (!std::isfinite(result)) {
             return 0.0F;
@@ -203,10 +213,22 @@ namespace MAF
 {
     float MorrowindDamageMultiplier(float armorRating, const Settings& settings)
     {
-        const auto armor = (std::max)(0.0F, armorRating);
+        if (!std::isfinite(armorRating)) {
+            return 1.0F;
+        }
+
+        const auto armor = std::abs(armorRating);
         const auto pct = (std::max)(0.0F, settings.percentHealthPerArmorPoint);
-        const auto multiplier = 1.0F / (1.0F + armor * pct);
-        return std::clamp(multiplier, settings.minDamageMultiplier, 1.0F);
+        const auto defensiveMultiplier = std::clamp(
+            1.0F / (1.0F + armor * pct),
+            settings.minDamageMultiplier,
+            1.0F);
+
+        if (armorRating >= 0.0F) {
+            return defensiveMultiplier;
+        }
+
+        return 1.0F + (1.0F - defensiveMultiplier);
     }
 
     float VanillaDamageMultiplier(float armorRating, const Settings& settings)
@@ -219,7 +241,6 @@ namespace MAF
     float GetArmorRating(RE::Actor& target, const Settings& settings)
     {
         auto armor = GetStoredActorValue(target, RE::ActorValue::kDamageResist);
-        armor = (std::max)(0.0F, armor);
 
         if (settings.armorSource == ArmorSource::kDisplayedPlusHiddenArmorSlots) {
             armor += HiddenArmorBonus(target, settings);

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.5
+
+- Adds odd-symmetric negative armor scaling: negative armor increases physical damage by the same relative amount that positive armor would reduce it.
+- Keeps `minDamageMultiplier` symmetrical; for example, `0.20` caps positive reduction at `0.20x` and negative amplification at `1.80x`.
+- Improves signed `DamageResist` reconstruction by combining cached/base armor with actor-value modifiers instead of discarding negative totals.
+
 ## 1.0.4
 
 - Includes non-virtual `DamageResist` actor-value modifiers when calculating armor.

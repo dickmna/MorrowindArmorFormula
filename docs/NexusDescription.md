@@ -9,18 +9,21 @@ Skyrim normally treats each armor point as a fixed amount of damage reduction, t
 This plugin instead uses:
 
 ```text
-physical damage multiplier = 1 / (1 + armorRating * percentHealthPerArmorPoint)
+positive armor multiplier = 1 / (1 + armorRating * percentHealthPerArmorPoint)
+negative armor multiplier = 2 - (1 / (1 + abs(armorRating) * percentHealthPerArmorPoint))
 ```
 
 Default examples:
 
 ```text
-100 armor -> 50% physical damage
-300 armor -> 25% physical damage
-900 armor -> 10% physical damage
+ -300 armor -> 175% physical damage
+ -100 armor -> 150% physical damage
+  100 armor -> 50% physical damage
+  300 armor -> 25% physical damage
+  900 armor -> 10% physical damage
 ```
 
-Every point of armor grants the same effective-health value. The vanilla 80% cap is bypassed unless you configure your own cap.
+Every point of positive armor grants the same effective-health value. Negative armor is handled as the odd-symmetric opposite: it increases physical damage by the same relative amount that equivalent positive armor would reduce it. The vanilla 80% cap is bypassed unless you configure your own cap.
 
 ## Requirements
 
@@ -47,7 +50,7 @@ minDamageMultiplier = 0.0
 armorSource = "displayed"
 ```
 
-`minDamageMultiplier = 0.0` means no artificial maximum reduction. Use `0.20` if you want an 80% cap on the new curve.
+`minDamageMultiplier = 0.0` means no artificial maximum positive-armor reduction. Use `0.20` if you want an 80% cap on the new curve. Because negative armor is symmetric, `0.20` also caps negative-armor amplification at `180%`.
 
 Version 1.0.1 also includes `affectUnidentifiedHealthDamage`, a fallback for damage calls where Skyrim does not expose recent physical hit data. Disable it if you only want confirmed physical hits to be adjusted.
 

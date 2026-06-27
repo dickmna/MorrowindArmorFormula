@@ -1,6 +1,7 @@
 # MorrowindArmorFormula
 # Each point of armor adds a configurable percentage of pre-armor effective health.
-# Final physical damage multiplier: 1 / (1 + armor * percentHealthPerArmorPoint)
+# Positive armor multiplier: 1 / (1 + armor * percentHealthPerArmorPoint)
+# Negative armor multiplier: 2 - (1 / (1 + abs(armor) * percentHealthPerArmorPoint))
 
 enabled = true
 
@@ -14,9 +15,11 @@ armorSource = "displayed"
 
 # 0.01 means every 1 armor rating adds 1% effective health.
 # Examples: 100 armor = 50% physical damage, 300 armor = 25%, 900 armor = 10%.
+# Negative examples: -100 armor = 150% physical damage, -300 armor = 175%.
 percentHealthPerArmorPoint = 0.01
 
-# 0.0 means no artificial cap. Set 0.05 for a 95% max reduction, 0.20 for Skyrim-like 80%.
+# 0.0 means no artificial positive-armor cap. Set 0.05 for a 95% max reduction,
+# 0.20 for Skyrim-like 80%. Negative armor is symmetric, so 0.20 caps amplification at 180%.
 minDamageMultiplier = 0.0
 
 # Only used when armorSource = "displayedPlusHidden".

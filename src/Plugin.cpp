@@ -7,7 +7,7 @@
 using namespace std::literals;
 
 SKSEPluginInfo(
-    .Version = REL::Version{ 1, 0, 4, 0 },
+    .Version = REL::Version{ 1, 0, 5, 0 },
     .Name = "MorrowindArmorFormula"sv,
     .Author = "Codex"sv,
     .StructCompatibility = SKSE::StructCompatibility::Independent,
@@ -36,7 +36,7 @@ namespace
     void LogFormulaExamples()
     {
         const auto& settings = MAF::GetSettings();
-        for (const auto armor : { 0.0F, 100.0F, 300.0F, 600.0F, 900.0F }) {
+        for (const auto armor : { -300.0F, -100.0F, 0.0F, 100.0F, 300.0F, 600.0F, 900.0F }) {
             SKSE::log::info(
                 "Armor {} -> damage multiplier {}",
                 armor,
@@ -50,7 +50,7 @@ SKSEPluginLoad(const SKSE::LoadInterface* skse)
     SKSE::Init(skse);
     SetupLog();
 
-    SKSE::log::info("MorrowindArmorFormula 1.0.4 loading");
+    SKSE::log::info("MorrowindArmorFormula 1.0.5 loading");
 
     MAF::LoadSettings();
     LogFormulaExamples();

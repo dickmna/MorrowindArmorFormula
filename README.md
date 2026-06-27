@@ -3,15 +3,18 @@
 MorrowindArmorFormula is an SKSE plugin that replaces Skyrim's capped linear armor damage reduction with an effective-health style armor formula.
 
 ```text
-physical damage multiplier = 1 / (1 + armorRating * percentHealthPerArmorPoint)
+positive armor multiplier = 1 / (1 + armorRating * percentHealthPerArmorPoint)
+negative armor multiplier = 2 - (1 / (1 + abs(armorRating) * percentHealthPerArmorPoint))
 ```
 
 With the default `percentHealthPerArmorPoint = 0.01`:
 
 ```text
-100 armor -> 50% physical damage
-300 armor -> 25% physical damage
-900 armor -> 10% physical damage
+ -300 armor -> 175% physical damage
+ -100 armor -> 150% physical damage
+  100 armor -> 50% physical damage
+  300 armor -> 25% physical damage
+  900 armor -> 10% physical damage
 ```
 
 This bypasses Skyrim's vanilla 80% armor damage reduction cap because it adjusts final health damage after vanilla physical armor reduction has already been calculated.
@@ -45,7 +48,7 @@ The main setting is:
 percentHealthPerArmorPoint = 0.01
 ```
 
-Set `minDamageMultiplier = 0.0` for no artificial cap. Set it to `0.20` to restore an 80% maximum reduction while keeping the new curve.
+Set `minDamageMultiplier = 0.0` for no artificial positive-armor cap. Set it to `0.20` to restore an 80% maximum reduction while keeping the new curve. Negative armor uses the same curve in reverse, so `minDamageMultiplier = 0.20` also caps negative-armor amplification at `180%`.
 
 For testing and compatibility, `affectUnidentifiedHealthDamage = true` also scales health damage when Skyrim does not expose recent physical hit data to the plugin. Set it to `false` if you only want confirmed physical hits to be adjusted.
 
