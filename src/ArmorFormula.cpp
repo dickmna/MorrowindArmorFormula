@@ -4,8 +4,6 @@
 
 namespace
 {
-    constexpr RE::FormID kDragonhideEffectFormID = 0x000CDB75;
-
     using Slot = RE::BGSBipedObjectForm::BipedObjectSlot;
 
     [[nodiscard]] bool IsPlayer(RE::Actor& actor)
@@ -141,42 +139,6 @@ namespace
         return process->middleHigh->lastHitData;
     }
 
-    [[nodiscard]] bool IsInactiveOrDispelled(const RE::ActiveEffect& activeEffect)
-    {
-        return activeEffect.flags.any(RE::ActiveEffect::Flag::kInactive, RE::ActiveEffect::Flag::kDispelled);
-    }
-
-    [[nodiscard]] bool HasActiveMagicEffect(RE::Actor& target, RE::FormID effectFormID)
-    {
-        auto* activeEffects = target.GetActiveEffectList();
-        if (!activeEffects) {
-            return false;
-        }
-
-        for (const auto* activeEffect : *activeEffects) {
-            if (!activeEffect || IsInactiveOrDispelled(*activeEffect)) {
-                continue;
-            }
-
-            const auto* effect = activeEffect->effect;
-            const auto* baseEffect = effect ? effect->baseEffect : nullptr;
-            if (baseEffect && baseEffect->GetFormID() == effectFormID) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    [[nodiscard]] float ExtraPhysicalDamageMultiplier(RE::Actor& target, const MAF::Settings& settings)
-    {
-        if (settings.preserveDragonhide && HasActiveMagicEffect(target, kDragonhideEffectFormID)) {
-            return settings.dragonhideDamageMultiplier;
-        }
-
-        return 1.0F;
-    }
-
     [[nodiscard]] bool HitDataMatches(RE::Actor& target, RE::Actor* attacker, const RE::HitData& hitData)
     {
         if (const auto hitTarget = hitData.target.get(); hitTarget && hitTarget.get() != &target) {
@@ -192,7 +154,7 @@ namespace
         return true;
     }
 
-    [[nodiscard]] float GetVanillaFinalPhysicalDamage(const RE::HitData& hitData, float incomingDamage)
+    [[nodiscard]] float GetVanillaArmorFinalPhysicalDamage(const RE::HitData& hitData)
     {
         const auto rawPhysical = (std::max)(0.0F, hitData.physicalDamage);
         if (rawPhysical <= 0.0F) {
@@ -200,8 +162,26 @@ namespace
         }
 
         const auto resisted = std::clamp(hitData.resistedPhysicalDamage, 0.0F, rawPhysical);
-        const auto finalPhysical = (std::max)(0.0F, rawPhysical - resisted);
-        return (std::min)(finalPhysical, (std::max)(0.0F, incomingDamage));
+        return (std::max)(0.0F, rawPhysical - resisted);
+    }
+
+    [[nodiscard]] float GetObservedPhysicalDamage(float vanillaArmorFinalPhysical, float incomingDamage)
+    {
+        return (std::min)(vanillaArmorFinalPhysical, (std::max)(0.0F, incomingDamage));
+    }
+
+    [[nodiscard]] float GetPostArmorPhysicalMultiplier(float vanillaArmorFinalPhysical, float incomingDamage)
+    {
+        if (vanillaArmorFinalPhysical <= 0.0F) {
+            return 1.0F;
+        }
+
+        const auto incoming = (std::max)(0.0F, incomingDamage);
+        if (incoming >= vanillaArmorFinalPhysical) {
+            return 1.0F;
+        }
+
+        return std::clamp(incoming / vanillaArmorFinalPhysical, 0.0F, 1.0F);
     }
 
     [[nodiscard]] float FallbackRawPhysicalDamageFromVanillaResult(
@@ -295,16 +275,14 @@ namespace MAF
 
         const auto armor = GetArmorRating(target, settings);
         const auto desiredMultiplier = MorrowindDamageMultiplier(armor, settings);
-        const auto extraPhysicalMultiplier = ExtraPhysicalDamageMultiplier(target, settings);
 
         const auto* player = RE::PlayerCharacter::GetSingleton();
         if (settings.logAdjustments && player && target.GetFormID() == player->GetFormID()) {
             SKSE::log::info(
-                "Armor rating read: target={:08X}, armor={}, damageMultiplier={}, extraPhysicalMultiplier={}",
+                "Armor rating read: target={:08X}, armor={}, damageMultiplier={}",
                 target.GetFormID(),
                 armor,
-                desiredMultiplier,
-                extraPhysicalMultiplier);
+                desiredMultiplier);
         }
 
         auto* hitData = GetLastHitData(target);
@@ -336,18 +314,21 @@ namespace MAF
                 std::string_view{ "stale or zero physical hit data" });
         }
 
-        const auto vanillaFinalPhysical = GetVanillaFinalPhysicalDamage(*hitData, incomingDamage);
-        const auto desiredFinalPhysical = rawPhysical * desiredMultiplier * extraPhysicalMultiplier;
-        const auto adjusted = (std::max)(0.0F, incomingDamage - vanillaFinalPhysical + desiredFinalPhysical);
+        const auto vanillaArmorFinalPhysical = GetVanillaArmorFinalPhysicalDamage(*hitData);
+        const auto observedPhysical = GetObservedPhysicalDamage(vanillaArmorFinalPhysical, incomingDamage);
+        const auto postArmorMultiplier = GetPostArmorPhysicalMultiplier(vanillaArmorFinalPhysical, incomingDamage);
+        const auto desiredFinalPhysical = rawPhysical * desiredMultiplier * postArmorMultiplier;
+        const auto adjusted = (std::max)(0.0F, incomingDamage - observedPhysical + desiredFinalPhysical);
 
         if (settings.logAdjustments) {
             SKSE::log::info(
-                "Adjusted hit damage: target={:08X}, armor={}, extraPhysicalMultiplier={}, rawPhysical={}, vanillaPhysical={}, desiredPhysical={}, incoming={}, adjusted={}",
+                "Adjusted hit damage: target={:08X}, armor={}, postArmorMultiplier={}, rawPhysical={}, vanillaArmorPhysical={}, observedPhysical={}, desiredPhysical={}, incoming={}, adjusted={}",
                 target.GetFormID(),
                 armor,
-                extraPhysicalMultiplier,
+                postArmorMultiplier,
                 rawPhysical,
-                vanillaFinalPhysical,
+                vanillaArmorFinalPhysical,
+                observedPhysical,
                 desiredFinalPhysical,
                 incomingDamage,
                 adjusted);

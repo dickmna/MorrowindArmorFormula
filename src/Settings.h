@@ -31,8 +31,6 @@ namespace MAF
 
         bool requireRecentHitData = true;
         bool affectUnidentifiedHealthDamage = true;
-        bool preserveDragonhide = true;
-        float dragonhideDamageMultiplier = 0.20F;
         float staleHitDamageTolerance = 0.01F;
         bool logAdjustments = true;
     };

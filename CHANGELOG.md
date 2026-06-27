@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.7
+
+- Fixes the 1.0.6 crash by removing active magic effect scanning from the damage hook.
+- Preserves Dragonhide and similar post-armor physical damage multipliers by inferring the multiplier from Skyrim's already-calculated incoming hit damage.
+- Removes the `preserveDragonhide` and `dragonhideDamageMultiplier` settings; Dragonhide preservation is now automatic for confirmed physical hits.
+
 ## 1.0.6
 
 - Preserves vanilla Dragonhide by applying its `0.20x` physical damage multiplier after the Morrowind-style armor formula when `ArmorFFSelf100` is active.

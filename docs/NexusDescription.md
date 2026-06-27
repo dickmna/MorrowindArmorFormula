@@ -25,7 +25,7 @@ Default examples:
 
 Every point of positive armor grants the same effective-health value. Negative armor is handled as the odd-symmetric opposite: it increases physical damage by the same relative amount that equivalent positive armor would reduce it. The vanilla 80% cap is bypassed unless you configure your own cap.
 
-Vanilla Dragonhide is preserved separately. Dragonhide is not a normal `DamageResist` armor bonus; the game implements its 80% reduction through a `ModIncomingDamage` perk multiplier. When Dragonhide's vanilla `ArmorFFSelf100` effect is active on a confirmed physical hit, this plugin applies Dragonhide's `0.20x` multiplier after the armor formula.
+Vanilla Dragonhide is preserved as a post-armor physical damage multiplier. Dragonhide is not a normal `DamageResist` armor bonus; the game implements its 80% reduction through a `ModIncomingDamage` perk multiplier. This plugin replaces only the armor-reduced physical component and keeps the multiplier already present in Skyrim's incoming hit damage.
 
 ## Requirements
 
@@ -56,7 +56,7 @@ armorSource = "displayed"
 
 Version 1.0.1 also includes `affectUnidentifiedHealthDamage`, a fallback for damage calls where Skyrim does not expose recent physical hit data. Disable it if you only want confirmed physical hits to be adjusted.
 
-Version 1.0.6 adds `preserveDragonhide` and `dragonhideDamageMultiplier` for Dragonhide compatibility.
+Version 1.0.7 removes the old active-effect Dragonhide check and preserves Dragonhide automatically for confirmed physical hits.
 
 ## Compatibility Notes
 
