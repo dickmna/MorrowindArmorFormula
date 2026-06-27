@@ -49,6 +49,8 @@ armorSource = "displayed"
 
 `minDamageMultiplier = 0.0` means no artificial maximum reduction. Use `0.20` if you want an 80% cap on the new curve.
 
+Version 1.0.1 also includes `affectUnidentifiedHealthDamage`, a fallback for damage calls where Skyrim does not expose recent physical hit data. Disable it if you only want confirmed physical hits to be adjusted.
+
 ## Compatibility Notes
 
-The plugin adjusts recent physical hit damage through SKSE/CommonLibSSE. Magic damage and script damage are not changed by default. Mods that replace the same low-level health damage virtual function may conflict.
+The plugin adjusts recent physical hit damage through SKSE/CommonLibSSE. When `affectUnidentifiedHealthDamage` is enabled, unidentified health damage is also scaled by the armor formula. Mods that replace the same low-level health damage virtual function may conflict.

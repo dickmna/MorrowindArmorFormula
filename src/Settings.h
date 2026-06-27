@@ -30,8 +30,9 @@ namespace MAF
         float vanillaMaxReduction = 0.80F;
 
         bool requireRecentHitData = true;
+        bool affectUnidentifiedHealthDamage = true;
         float staleHitDamageTolerance = 0.01F;
-        bool logAdjustments = false;
+        bool logAdjustments = true;
     };
 
     [[nodiscard]] Settings& GetSettings();

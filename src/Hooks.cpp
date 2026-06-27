@@ -53,6 +53,14 @@ namespace
         auto adjustedDamage = damage;
         if (target) {
             adjustedDamage = MAF::AdjustHealthDamage(*target, attacker, damage, MAF::GetSettings());
+            if (MAF::GetSettings().logAdjustments) {
+                SKSE::log::info(
+                    "HandleHealthDamage hook: target={:08X}, attacker={:08X}, incoming={}, outgoing={}",
+                    target->GetFormID(),
+                    attacker ? attacker->GetFormID() : 0,
+                    damage,
+                    adjustedDamage);
+            }
         }
 
         original(target, attacker, adjustedDamage);

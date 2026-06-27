@@ -47,6 +47,10 @@ percentHealthPerArmorPoint = 0.01
 
 Set `minDamageMultiplier = 0.0` for no artificial cap. Set it to `0.20` to restore an 80% maximum reduction while keeping the new curve.
 
+For testing and compatibility, `affectUnidentifiedHealthDamage = true` also scales health damage when Skyrim does not expose recent physical hit data to the plugin. Set it to `false` if you only want confirmed physical hits to be adjusted.
+
+`logAdjustments = true` writes adjustment details to `Documents/My Games/Skyrim Special Edition/SKSE/MorrowindArmorFormula.log`.
+
 ## Build
 
 Install Visual Studio 2022 Build Tools and vcpkg, then run:
@@ -66,7 +70,7 @@ Some CommonLibSSE-NG installations also require adding the `rapidcsv_x64-windows
 
 ## Compatibility
 
-The plugin hooks `Actor::HandleHealthDamage` and uses `lastHitData` to adjust recent physical hits only. Magical damage, poison, scripts, traps, and other non-hit health damage are left alone by default.
+The plugin hooks `Actor::HandleHealthDamage` and uses `lastHitData` to adjust recent physical hits when available. If `affectUnidentifiedHealthDamage` is enabled, unidentified health damage is also scaled by the armor formula as a fallback.
 
 Other SKSE plugins that also replace `Actor::HandleHealthDamage` may conflict depending on load order and hook implementation.
 

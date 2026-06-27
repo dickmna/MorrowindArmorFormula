@@ -30,9 +30,13 @@ hiddenArmorFeet = true
 vanillaArmorReductionPerPoint = 0.0012
 vanillaMaxReduction = 0.80
 
-# Keep this true for safer behavior: only weapon/unarmed physical hits with recent hit data are adjusted.
+# If true, direct/unknown health damage is also scaled by the armor formula when recent hit data is unavailable.
+# This is useful for compatibility and testing; set false if you only want confirmed physical HitData to be adjusted.
+affectUnidentifiedHealthDamage = true
+
+# Keep this true to prefer recent physical HitData when available.
 requireRecentHitData = true
 staleHitDamageTolerance = 0.01
 
-# Enable only while testing; this can make a large log.
-logAdjustments = false
+# Enable while testing; this can make a large log.
+logAdjustments = true

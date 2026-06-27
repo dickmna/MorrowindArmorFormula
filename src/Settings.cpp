@@ -118,6 +118,8 @@ namespace
             settings.vanillaMaxReduction = ParseFloat(value, settings.vanillaMaxReduction);
         } else if (key == "requireRecentHitData") {
             settings.requireRecentHitData = ParseBool(value, settings.requireRecentHitData);
+        } else if (key == "affectUnidentifiedHealthDamage") {
+            settings.affectUnidentifiedHealthDamage = ParseBool(value, settings.affectUnidentifiedHealthDamage);
         } else if (key == "staleHitDamageTolerance") {
             settings.staleHitDamageTolerance = ParseFloat(value, settings.staleHitDamageTolerance);
         } else if (key == "logAdjustments") {
@@ -169,9 +171,12 @@ namespace MAF
         settings.staleHitDamageTolerance = (std::max)(0.0F, settings.staleHitDamageTolerance);
 
         SKSE::log::info(
-            "Loaded config: enabled={}, percentHealthPerArmorPoint={}, minDamageMultiplier={}",
+            "Loaded config: enabled={}, percentHealthPerArmorPoint={}, minDamageMultiplier={}, requireRecentHitData={}, affectUnidentifiedHealthDamage={}, logAdjustments={}",
             settings.enabled,
             settings.percentHealthPerArmorPoint,
-            settings.minDamageMultiplier);
+            settings.minDamageMultiplier,
+            settings.requireRecentHitData,
+            settings.affectUnidentifiedHealthDamage,
+            settings.logAdjustments);
     }
 }

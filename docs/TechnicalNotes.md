@@ -17,4 +17,14 @@ adjustedHealthDamage =
     + morrowindStyleFinalPhysicalDamage
 ```
 
-This keeps typed damage, enchantment damage, and other non-armor components intact while replacing the armor portion. With `requireRecentHitData = true`, the plugin refuses to adjust damage unless a recent physical hit can be identified.
+This keeps typed damage, enchantment damage, and other non-armor components intact while replacing the armor portion when reliable hit data is available.
+
+If Skyrim does not expose recent hit data for a health-damage call, `affectUnidentifiedHealthDamage = true` scales the incoming health damage directly:
+
+```text
+adjustedHealthDamage =
+    incomingHealthDamage
+    / (1 + armorRating * percentHealthPerArmorPoint)
+```
+
+This fallback is useful for testing, console-driven damage, and compatibility with damage sources that bypass normal physical hit data. Set it to `false` if the plugin should only affect confirmed physical hits.
