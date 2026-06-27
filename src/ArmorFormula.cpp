@@ -13,7 +13,7 @@ namespace
 
     [[nodiscard]] bool IsNpc(RE::Actor& actor)
     {
-        return actor.GetActorBase() != nullptr;
+        return &actor != RE::PlayerCharacter::GetSingleton();
     }
 
     [[nodiscard]] bool ShouldAffectActor(RE::Actor& target, const MAF::Settings& settings)
@@ -56,6 +56,36 @@ namespace
         }
 
         return slots * settings.hiddenArmorPerSlot;
+    }
+
+    [[nodiscard]] float GetStoredActorValue(RE::Actor& target, RE::ActorValue actorValue)
+    {
+        const auto& runtimeData = target.GetActorRuntimeData();
+
+        auto result = 0.0F;
+        auto found = false;
+
+        if (const auto* base = runtimeData.avStorage.baseValues[actorValue]) {
+            result += *base;
+            found = true;
+        }
+
+        if (const auto* modifiers = runtimeData.avStorage.modifiers[actorValue]) {
+            result += modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kPermanent];
+            result += modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kTemporary];
+            result += modifiers->modifiers[RE::ACTOR_VALUE_MODIFIER::kDamage];
+            found = true;
+        }
+
+        if (!found && actorValue == RE::ActorValue::kDamageResist) {
+            result = runtimeData.armorRating;
+        }
+
+        if (!std::isfinite(result)) {
+            return 0.0F;
+        }
+
+        return result;
     }
 
     [[nodiscard]] RE::HitData* GetLastHitData(RE::Actor& target)
@@ -157,7 +187,7 @@ namespace MAF
 
     float GetArmorRating(RE::Actor& target, const Settings& settings)
     {
-        auto armor = target.GetActorValue(RE::ActorValue::kDamageResist);
+        auto armor = GetStoredActorValue(target, RE::ActorValue::kDamageResist);
         armor = (std::max)(0.0F, armor);
 
         if (settings.armorSource == ArmorSource::kDisplayedPlusHiddenArmorSlots) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.3
+
+- Fixes a crash in armor reading by avoiding `ActorValueOwner::GetActorValue`.
+- Reads `DamageResist` directly from actor value storage, with `armorRating` as a fallback.
+- Avoids `GetActorBase` during affect-target checks.
+
 ## 1.0.2
 
 - Adds a second hook at `Actor::CheckClampDamageModifier` for final health actor-value damage.

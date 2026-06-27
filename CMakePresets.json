@@ -9,7 +9,7 @@
       "binaryDir": "${sourceDir}/build/vs2022-release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/dist/MorrowindArmorFormula-1.0.2"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/dist/MorrowindArmorFormula-1.0.3"
       }
     }
   ],
