@@ -37,6 +37,11 @@ vanillaMaxReduction = 0.80
 # This is useful for compatibility and testing; set false if you only want confirmed physical HitData to be adjusted.
 affectUnidentifiedHealthDamage = true
 
+# Vanilla Dragonhide uses ArmorFFSelf100 plus a perk entry that multiplies incoming damage by 0.2.
+# Keep this true to preserve that separate 80% physical reduction on confirmed physical hits.
+preserveDragonhide = true
+dragonhideDamageMultiplier = 0.20
+
 # Keep this true to prefer recent physical HitData when available.
 requireRecentHitData = true
 staleHitDamageTolerance = 0.01

@@ -50,6 +50,8 @@ percentHealthPerArmorPoint = 0.01
 
 Set `minDamageMultiplier = 0.0` for no artificial positive-armor cap. Set it to `0.20` to restore an 80% maximum reduction while keeping the new curve. Negative armor uses the same curve in reverse, so `minDamageMultiplier = 0.20` also caps negative-armor amplification at `180%`.
 
+Vanilla Dragonhide is preserved separately. It is not treated as armor; when the vanilla `ArmorFFSelf100` effect is active on a confirmed physical hit, the plugin applies Dragonhide's `0.20x` physical damage multiplier after the Morrowind-style armor formula.
+
 For testing and compatibility, `affectUnidentifiedHealthDamage = true` also scales health damage when Skyrim does not expose recent physical hit data to the plugin. Set it to `false` if you only want confirmed physical hits to be adjusted.
 
 `logAdjustments = true` writes adjustment details to `Documents/My Games/Skyrim Special Edition/SKSE/MorrowindArmorFormula.log`.
@@ -74,6 +76,8 @@ Some CommonLibSSE-NG installations also require adding the `rapidcsv_x64-windows
 ## Compatibility
 
 The plugin hooks `Actor::HandleHealthDamage` and uses `lastHitData` to adjust recent physical hits when available. If `affectUnidentifiedHealthDamage` is enabled, unidentified health damage is also scaled by the armor formula as a fallback.
+
+The plugin explicitly preserves vanilla Dragonhide (`ArmorFFSelf100 [MGEF:000CDB75]`) on confirmed physical hits by applying its separate `0.20x` incoming-damage multiplier after the armor formula.
 
 Other SKSE plugins that also replace `Actor::HandleHealthDamage` may conflict depending on load order and hook implementation.
 

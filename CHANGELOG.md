@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.6
+
+- Preserves vanilla Dragonhide by applying its `0.20x` physical damage multiplier after the Morrowind-style armor formula when `ArmorFFSelf100` is active.
+- Adds `preserveDragonhide` and `dragonhideDamageMultiplier` settings.
+- Logs the extra physical multiplier used for Dragonhide verification.
+
 ## 1.0.5
 
 - Adds odd-symmetric negative armor scaling: negative armor increases physical damage by the same relative amount that positive armor would reduce it.

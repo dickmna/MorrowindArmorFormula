@@ -54,7 +54,7 @@ try {
         "-B", "build\vs2022-release",
         "-G", "Visual Studio 17 2022",
         "-A", "x64",
-        "-DCMAKE_INSTALL_PREFIX=dist\MorrowindArmorFormula-1.0.5"
+        "-DCMAKE_INSTALL_PREFIX=dist\MorrowindArmorFormula-1.0.6"
     )
 
     if ($CMakePrefixPath) {

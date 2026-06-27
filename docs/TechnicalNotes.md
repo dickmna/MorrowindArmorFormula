@@ -20,8 +20,10 @@ The rest of the incoming health damage is preserved:
 adjustedHealthDamage =
     incomingHealthDamage
     - vanillaFinalPhysicalDamage
-    + morrowindStyleFinalPhysicalDamage
+    + morrowindStyleFinalPhysicalDamage * extraPhysicalMultiplier
 ```
+
+For vanilla Dragonhide, `extraPhysicalMultiplier` is `0.20` when `ArmorFFSelf100 [MGEF:000CDB75]` is active on the target. Dragonhide is preserved as an independent physical damage multiplier because Skyrim implements its 80% reduction through `DragonhideSpellPerk [PERK:00109639]` / `ModIncomingDamage`, not as a normal `DamageResist` armor value.
 
 This keeps typed damage, enchantment damage, and other non-armor components intact while replacing the armor portion when reliable hit data is available.
 

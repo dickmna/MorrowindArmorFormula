@@ -120,6 +120,10 @@ namespace
             settings.requireRecentHitData = ParseBool(value, settings.requireRecentHitData);
         } else if (key == "affectUnidentifiedHealthDamage") {
             settings.affectUnidentifiedHealthDamage = ParseBool(value, settings.affectUnidentifiedHealthDamage);
+        } else if (key == "preserveDragonhide") {
+            settings.preserveDragonhide = ParseBool(value, settings.preserveDragonhide);
+        } else if (key == "dragonhideDamageMultiplier") {
+            settings.dragonhideDamageMultiplier = ParseFloat(value, settings.dragonhideDamageMultiplier);
         } else if (key == "staleHitDamageTolerance") {
             settings.staleHitDamageTolerance = ParseFloat(value, settings.staleHitDamageTolerance);
         } else if (key == "logAdjustments") {
@@ -168,15 +172,18 @@ namespace MAF
         settings.hiddenArmorPerSlot = (std::max)(0.0F, settings.hiddenArmorPerSlot);
         settings.vanillaArmorReductionPerPoint = (std::max)(0.0F, settings.vanillaArmorReductionPerPoint);
         settings.vanillaMaxReduction = std::clamp(settings.vanillaMaxReduction, 0.0F, 0.99F);
+        settings.dragonhideDamageMultiplier = std::clamp(settings.dragonhideDamageMultiplier, 0.0F, 1.0F);
         settings.staleHitDamageTolerance = (std::max)(0.0F, settings.staleHitDamageTolerance);
 
         SKSE::log::info(
-            "Loaded config: enabled={}, percentHealthPerArmorPoint={}, minDamageMultiplier={}, requireRecentHitData={}, affectUnidentifiedHealthDamage={}, logAdjustments={}",
+            "Loaded config: enabled={}, percentHealthPerArmorPoint={}, minDamageMultiplier={}, requireRecentHitData={}, affectUnidentifiedHealthDamage={}, preserveDragonhide={}, dragonhideDamageMultiplier={}, logAdjustments={}",
             settings.enabled,
             settings.percentHealthPerArmorPoint,
             settings.minDamageMultiplier,
             settings.requireRecentHitData,
             settings.affectUnidentifiedHealthDamage,
+            settings.preserveDragonhide,
+            settings.dragonhideDamageMultiplier,
             settings.logAdjustments);
     }
 }

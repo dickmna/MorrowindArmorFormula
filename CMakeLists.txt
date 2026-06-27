@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.24)
 
 project(
     MorrowindArmorFormula
-    VERSION 1.0.5
+    VERSION 1.0.6
     LANGUAGES CXX
 )
 
