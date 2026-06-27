@@ -58,6 +58,28 @@ namespace
         return slots * settings.hiddenArmorPerSlot;
     }
 
+    [[nodiscard]] float SafeActorValueModifier(
+        RE::Actor& target,
+        RE::ACTOR_VALUE_MODIFIER modifier,
+        RE::ActorValue actorValue)
+    {
+        const auto value = target.GetActorValueModifier(modifier, actorValue);
+        if (!std::isfinite(value)) {
+            return 0.0F;
+        }
+
+        return value;
+    }
+
+    [[nodiscard]] float GetNonVirtualModifierTotal(RE::Actor& target, RE::ActorValue actorValue)
+    {
+        auto total = 0.0F;
+        total += SafeActorValueModifier(target, RE::ACTOR_VALUE_MODIFIER::kPermanent, actorValue);
+        total += SafeActorValueModifier(target, RE::ACTOR_VALUE_MODIFIER::kTemporary, actorValue);
+        total += SafeActorValueModifier(target, RE::ACTOR_VALUE_MODIFIER::kDamage, actorValue);
+        return total;
+    }
+
     [[nodiscard]] float GetStoredActorValue(RE::Actor& target, RE::ActorValue actorValue)
     {
         const auto& runtimeData = target.GetActorRuntimeData();
@@ -79,6 +101,15 @@ namespace
 
         if (!found && actorValue == RE::ActorValue::kDamageResist) {
             result = runtimeData.armorRating;
+        }
+
+        if (actorValue == RE::ActorValue::kDamageResist) {
+            result = (std::max)(result, runtimeData.armorRating);
+
+            const auto modifierTotal = GetNonVirtualModifierTotal(target, actorValue);
+            if (std::isfinite(modifierTotal) && std::abs(modifierTotal) > std::abs(result)) {
+                result = modifierTotal;
+            }
         }
 
         if (!std::isfinite(result)) {
@@ -205,6 +236,15 @@ namespace MAF
 
         const auto armor = GetArmorRating(target, settings);
         const auto desiredMultiplier = MorrowindDamageMultiplier(armor, settings);
+
+        const auto* player = RE::PlayerCharacter::GetSingleton();
+        if (settings.logAdjustments && player && target.GetFormID() == player->GetFormID()) {
+            SKSE::log::info(
+                "Armor rating read: target={:08X}, armor={}, damageMultiplier={}",
+                target.GetFormID(),
+                armor,
+                desiredMultiplier);
+        }
 
         auto* hitData = GetLastHitData(target);
         if (!hitData || !HitDataMatches(target, attacker, *hitData)) {

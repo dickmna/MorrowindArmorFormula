@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.0.4
+
+- Includes non-virtual `DamageResist` actor-value modifiers when calculating armor.
+- Fixes console `setav/forceav damageresist` test values being ignored.
+- Adds explicit player armor/multiplier logging for verification.
+
 ## 1.0.3
 
 - Fixes a crash in armor reading by avoiding `ActorValueOwner::GetActorValue`.
