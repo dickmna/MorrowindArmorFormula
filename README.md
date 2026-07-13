@@ -52,7 +52,7 @@ Set `minDamageMultiplier = 0.0` for no artificial positive-armor cap. Set it to 
 
 Vanilla Dragonhide is preserved as a post-armor physical damage multiplier. It is not treated as armor; the plugin replaces only the armor-reduced physical component and keeps the extra multiplier already present in Skyrim's incoming health damage.
 
-For testing and compatibility, `affectUnidentifiedHealthDamage = true` also scales health damage when Skyrim does not expose recent physical hit data to the plugin. Set it to `false` if you only want confirmed physical hits to be adjusted.
+Only confirmed physical hits are adjusted. Spells, poison, scripts, traps, and other unidentified health damage are left unchanged. The removed `affectUnidentifiedHealthDamage`, `requireRecentHitData`, and vanilla fallback settings in older configuration files are ignored.
 
 `logAdjustments = true` writes adjustment details to `Documents/My Games/Skyrim Special Edition/SKSE/MorrowindArmorFormula.log`.
 
@@ -75,7 +75,7 @@ Some CommonLibSSE-NG installations also require adding the `rapidcsv_x64-windows
 
 ## Compatibility
 
-The plugin hooks `Actor::HandleHealthDamage` and uses `lastHitData` to adjust recent physical hits when available. If `affectUnidentifiedHealthDamage` is enabled, unidentified health damage is also scaled by the armor formula as a fallback.
+The plugin hooks `Actor::HandleHealthDamage` and adjusts damage only when `lastHitData` contains a positive physical component and its target and aggressor match the current call. It does not hook the generic health actor-value clamp, because that path cannot distinguish physical damage from spells, poison, or scripts.
 
 The plugin preserves Dragonhide and similar post-armor physical damage multipliers by comparing Skyrim's armor-reduced physical damage against the incoming health damage that reaches the hook. It does not scan active magic effects in the damage hook.
 

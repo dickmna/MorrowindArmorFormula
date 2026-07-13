@@ -112,14 +112,6 @@ namespace
             settings.hiddenArmorHands = ParseBool(value, settings.hiddenArmorHands);
         } else if (key == "hiddenArmorFeet") {
             settings.hiddenArmorFeet = ParseBool(value, settings.hiddenArmorFeet);
-        } else if (key == "vanillaArmorReductionPerPoint") {
-            settings.vanillaArmorReductionPerPoint = ParseFloat(value, settings.vanillaArmorReductionPerPoint);
-        } else if (key == "vanillaMaxReduction") {
-            settings.vanillaMaxReduction = ParseFloat(value, settings.vanillaMaxReduction);
-        } else if (key == "requireRecentHitData") {
-            settings.requireRecentHitData = ParseBool(value, settings.requireRecentHitData);
-        } else if (key == "affectUnidentifiedHealthDamage") {
-            settings.affectUnidentifiedHealthDamage = ParseBool(value, settings.affectUnidentifiedHealthDamage);
         } else if (key == "staleHitDamageTolerance") {
             settings.staleHitDamageTolerance = ParseFloat(value, settings.staleHitDamageTolerance);
         } else if (key == "logAdjustments") {
@@ -166,17 +158,13 @@ namespace MAF
         settings.percentHealthPerArmorPoint = (std::max)(0.0F, settings.percentHealthPerArmorPoint);
         settings.minDamageMultiplier = std::clamp(settings.minDamageMultiplier, 0.0F, 1.0F);
         settings.hiddenArmorPerSlot = (std::max)(0.0F, settings.hiddenArmorPerSlot);
-        settings.vanillaArmorReductionPerPoint = (std::max)(0.0F, settings.vanillaArmorReductionPerPoint);
-        settings.vanillaMaxReduction = std::clamp(settings.vanillaMaxReduction, 0.0F, 0.99F);
         settings.staleHitDamageTolerance = (std::max)(0.0F, settings.staleHitDamageTolerance);
 
         SKSE::log::info(
-            "Loaded config: enabled={}, percentHealthPerArmorPoint={}, minDamageMultiplier={}, requireRecentHitData={}, affectUnidentifiedHealthDamage={}, logAdjustments={}",
+            "Loaded config: enabled={}, percentHealthPerArmorPoint={}, minDamageMultiplier={}, logAdjustments={}",
             settings.enabled,
             settings.percentHealthPerArmorPoint,
             settings.minDamageMultiplier,
-            settings.requireRecentHitData,
-            settings.affectUnidentifiedHealthDamage,
             settings.logAdjustments);
     }
 }

@@ -26,11 +26,6 @@ namespace MAF
         bool hiddenArmorHands = true;
         bool hiddenArmorFeet = true;
 
-        float vanillaArmorReductionPerPoint = 0.0012F;
-        float vanillaMaxReduction = 0.80F;
-
-        bool requireRecentHitData = true;
-        bool affectUnidentifiedHealthDamage = true;
         float staleHitDamageTolerance = 0.01F;
         bool logAdjustments = true;
     };

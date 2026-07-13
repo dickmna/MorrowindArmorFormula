@@ -29,16 +29,8 @@ hiddenArmorBody = true
 hiddenArmorHands = true
 hiddenArmorFeet = true
 
-# Used only for fallback reverse-calculation if requireRecentHitData is false.
-vanillaArmorReductionPerPoint = 0.0012
-vanillaMaxReduction = 0.80
-
-# If true, direct/unknown health damage is also scaled by the armor formula when recent hit data is unavailable.
-# This is useful for compatibility and testing; set false if you only want confirmed physical HitData to be adjusted.
-affectUnidentifiedHealthDamage = true
-
-# Keep this true to prefer recent physical HitData when available.
-requireRecentHitData = true
+# Damage is changed only when Skyrim provides matching physical HitData.
+# Spells, poison, scripts, traps, and unidentified health damage are left unchanged.
 staleHitDamageTolerance = 0.01
 
 # Enable while testing; this can make a large log.
