@@ -7,7 +7,7 @@
 using namespace std::literals;
 
 SKSEPluginInfo(
-    .Version = REL::Version{ 1, 0, 7, 0 },
+    .Version = REL::Version{ 1, 0, 8, 0 },
     .Name = "MorrowindArmorFormula"sv,
     .Author = "Codex"sv,
     .StructCompatibility = SKSE::StructCompatibility::Independent,
@@ -50,7 +50,7 @@ SKSEPluginLoad(const SKSE::LoadInterface* skse)
     SKSE::Init(skse);
     SetupLog();
 
-    SKSE::log::info("MorrowindArmorFormula 1.0.7 loading");
+    SKSE::log::info("MorrowindArmorFormula 1.0.8 loading");
 
     MAF::LoadSettings();
     LogFormulaExamples();

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.8
+
+- Restricts the armor formula to confirmed physical hits with matching target and aggressor `HitData`.
+- Removes unidentified-health-damage fallback scaling, which could apply armor to spells, poison, scripts, and other non-physical damage.
+- Stops hooking the generic health `CheckClampDamageModifier` path because it does not identify the damage source.
+- Ignores the removed `affectUnidentifiedHealthDamage`, `requireRecentHitData`, and vanilla fallback settings in older configuration files.
+
 ## 1.0.7
 
 - Fixes the 1.0.6 crash by removing active magic effect scanning from the damage hook.

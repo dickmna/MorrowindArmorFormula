@@ -54,10 +54,10 @@ armorSource = "displayed"
 
 `minDamageMultiplier = 0.0` means no artificial maximum positive-armor reduction. Use `0.20` if you want an 80% cap on the new curve. Because negative armor is symmetric, `0.20` also caps negative-armor amplification at `180%`.
 
-Version 1.0.1 also includes `affectUnidentifiedHealthDamage`, a fallback for damage calls where Skyrim does not expose recent physical hit data. Disable it if you only want confirmed physical hits to be adjusted.
-
 Version 1.0.7 removes the old active-effect Dragonhide check and preserves Dragonhide automatically for confirmed physical hits.
+
+Version 1.0.8 removes unidentified damage scaling and the generic health actor-value hook. The formula now requires matching target/aggressor physical `HitData`, so spells, poison, scripts, traps, and other unconfirmed damage remain unchanged. Obsolete fallback settings in older configuration files are ignored.
 
 ## Compatibility Notes
 
-The plugin adjusts recent physical hit damage through SKSE/CommonLibSSE. When `affectUnidentifiedHealthDamage` is enabled, unidentified health damage is also scaled by the armor formula. Mods that replace the same low-level health damage virtual function may conflict.
+The plugin adjusts confirmed physical hit damage through SKSE/CommonLibSSE. Mods that replace the same low-level health damage virtual function may conflict.

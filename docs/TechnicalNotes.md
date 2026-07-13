@@ -29,12 +29,6 @@ For vanilla Dragonhide, this preserves the independent `0.20x` physical damage m
 
 This keeps typed damage, enchantment damage, and other non-armor components intact while replacing the armor portion when reliable hit data is available.
 
-If Skyrim does not expose recent hit data for a health-damage call, `affectUnidentifiedHealthDamage = true` scales the incoming health damage directly:
+The formula is applied only when the current `HandleHealthDamage` call has a non-null attacker and Skyrim's `lastHitData` has the same target and aggressor plus a positive physical component. Missing or mismatched hit data is passed through unchanged.
 
-```text
-adjustedHealthDamage =
-    incomingHealthDamage
-    * morrowindStyleDamageMultiplier
-```
-
-This fallback is useful for testing, console-driven damage, and compatibility with damage sources that bypass normal physical hit data. Set it to `false` if the plugin should only affect confirmed physical hits.
+The plugin deliberately does not rewrite `Actor::CheckClampDamageModifier` health deltas. That generic actor-value path receives spells, poison, scripts, and other health damage without enough source information to classify it safely. Older `affectUnidentifiedHealthDamage`, `requireRecentHitData`, and vanilla fallback configuration keys are ignored.

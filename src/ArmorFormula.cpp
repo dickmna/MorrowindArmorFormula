@@ -141,17 +141,17 @@ namespace
 
     [[nodiscard]] bool HitDataMatches(RE::Actor& target, RE::Actor* attacker, const RE::HitData& hitData)
     {
-        if (const auto hitTarget = hitData.target.get(); hitTarget && hitTarget.get() != &target) {
+        if (!attacker) {
             return false;
         }
 
-        if (attacker) {
-            if (const auto hitAggressor = hitData.aggressor.get(); hitAggressor && hitAggressor.get() != attacker) {
-                return false;
-            }
+        const auto hitTarget = hitData.target.get();
+        if (!hitTarget || hitTarget.get() != &target) {
+            return false;
         }
 
-        return true;
+        const auto hitAggressor = hitData.aggressor.get();
+        return hitAggressor && hitAggressor.get() == attacker;
     }
 
     [[nodiscard]] float GetVanillaArmorFinalPhysicalDamage(const RE::HitData& hitData)
@@ -184,46 +184,21 @@ namespace
         return std::clamp(incoming / vanillaArmorFinalPhysical, 0.0F, 1.0F);
     }
 
-    [[nodiscard]] float FallbackRawPhysicalDamageFromVanillaResult(
-        float incomingDamage,
-        float armorRating,
-        const MAF::Settings& settings)
-    {
-        const auto vanillaMult = (std::max)(0.01F, MAF::VanillaDamageMultiplier(armorRating, settings));
-        return (std::max)(0.0F, incomingDamage) / vanillaMult;
-    }
-
-    [[nodiscard]] float AdjustUnidentifiedDamage(
+    [[nodiscard]] float SkipUnconfirmedDamage(
         RE::Actor& target,
         float incomingDamage,
-        float armorRating,
-        float desiredMultiplier,
         const MAF::Settings& settings,
         std::string_view reason)
     {
-        if (!settings.affectUnidentifiedHealthDamage) {
-            if (settings.logAdjustments) {
-                SKSE::log::info(
-                    "Skipped unidentified damage: target={:08X}, reason={}, incoming={}",
-                    target.GetFormID(),
-                    reason,
-                    incomingDamage);
-            }
-            return incomingDamage;
-        }
-
-        const auto desiredDamage = (std::max)(0.0F, incomingDamage) * desiredMultiplier;
         if (settings.logAdjustments) {
             SKSE::log::info(
-                "Adjusted unidentified damage: target={:08X}, reason={}, armor={}, incoming={}, adjusted={}",
+                "Skipped unconfirmed physical damage: target={:08X}, reason={}, incoming={}",
                 target.GetFormID(),
                 reason,
-                armorRating,
-                incomingDamage,
-                desiredDamage);
+                incomingDamage);
         }
 
-        return desiredDamage;
+        return incomingDamage;
     }
 }
 
@@ -247,13 +222,6 @@ namespace MAF
         }
 
         return 1.0F + (1.0F - defensiveMultiplier);
-    }
-
-    float VanillaDamageMultiplier(float armorRating, const Settings& settings)
-    {
-        const auto armor = (std::max)(0.0F, armorRating);
-        const auto reduction = (std::min)(settings.vanillaMaxReduction, armor * settings.vanillaArmorReductionPerPoint);
-        return std::clamp(1.0F - reduction, 0.01F, 1.0F);
     }
 
     float GetArmorRating(RE::Actor& target, const Settings& settings)
@@ -287,29 +255,19 @@ namespace MAF
 
         auto* hitData = GetLastHitData(target);
         if (!hitData || !HitDataMatches(target, attacker, *hitData)) {
-            if (settings.requireRecentHitData) {
-                return AdjustUnidentifiedDamage(
-                    target,
-                    incomingDamage,
-                    armor,
-                    desiredMultiplier,
-                    settings,
-                    hitData ? std::string_view{ "last hit data mismatch" } :
-                              std::string_view{ "missing last hit data" });
-            }
-
-            const auto rawPhysical = FallbackRawPhysicalDamageFromVanillaResult(incomingDamage, armor, settings);
-            const auto desiredPhysical = rawPhysical * desiredMultiplier;
-            return (std::max)(0.0F, desiredPhysical);
+            return SkipUnconfirmedDamage(
+                target,
+                incomingDamage,
+                settings,
+                hitData ? std::string_view{ "last hit data mismatch" } :
+                          std::string_view{ "missing last hit data" });
         }
 
         const auto rawPhysical = (std::max)(0.0F, hitData->physicalDamage);
         if (rawPhysical <= settings.staleHitDamageTolerance) {
-            return AdjustUnidentifiedDamage(
+            return SkipUnconfirmedDamage(
                 target,
                 incomingDamage,
-                armor,
-                desiredMultiplier,
                 settings,
                 std::string_view{ "stale or zero physical hit data" });
         }
